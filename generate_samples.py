@@ -1,15 +1,11 @@
 #!/usr/env python
 
 from nltk.tokenize import TweetTokenizer
-from util import readlines, stripaccents
+from util import *
+from features import *
 import time
 import re
 
-
-re_laugh = re.compile(".*j[aeiou]j.*")
-
-def is_laugh(word):
-    return re_laugh.match(word)
 
 def generate_samples(samples, bow, outputfile, classposition):
     start_time = time.time()
@@ -32,27 +28,47 @@ def generate_samples(samples, bow, outputfile, classposition):
         if len(parts) > 2:
             tweet = " ".join(parts[2:-1])
         
-            words = tokenizer.tokenize(stripaccents(tweet))
+            words = tokenizer.tokenize(tweet)
             
             total_words = 0
+            total_emojis = 0
             total_hashtags = 0
             total_mentions = 0
             total_laughs = 0
-        
-            for w in words:
+            total_urls = 0
+            total_numbers = 0
+            total_emails = 0
+            total_flooding = 0
+
+            for wi in words:
+                total_words += 1
+                
+                if is_emoji(wi):
+                    total_emojis += 1                    
+                  
+                w = stripaccents(wi)
+
+                # Si era algun tipo de simbolo que se ha eliminado no continua
+                if w == "":
+                    continue
+
                 if w in bow_index:
                     bow_line[bow_index[w]] = bow_line[bow_index[w]] + 1
                     
-                total_words += 1
-                
-                if w.startswith("#"):
-                    total_hashtags += 1
-                    
-                if w.startswith("@"):
+                if is_hashtag(w):
+                    total_hashtags += 1     
+                if is_mention(w):
                     total_mentions += 1
-
                 if is_laugh(w):
-                    total_laughs += 1 
+                    total_laughs += 1
+                if is_url(w):
+                    total_urls += 1
+                if is_number(w):
+                    total_numbers += 1
+                if is_email(w):
+                    total_emails += 1
+                if has_character_flooding(w):
+                    total_flooding += 1
                 
             line = parts[classposition]
             
@@ -67,8 +83,15 @@ def generate_samples(samples, bow, outputfile, classposition):
             
             for k in bow_line:
                 line += " " + str(float(k) / total)
-                
-            line += " " + str(float(total_hashtags) / total_words) + " " + str(float(total_mentions) / total_words) + " " + str(float(total_laughs) / total_words)
+               
+            line += " " + str(float(total_emojis) / total_words)
+            line += " " + str(float(total_hashtags) / total_words) 
+            line += " " + str(float(total_mentions) / total_words)
+            line += " " + str(float(total_laughs) / total_words)
+            line += " " + str(float(total_urls) / total_words)
+            line += " " + str(float(total_numbers) / total_words)
+            line += " " + str(float(total_emails) / total_words)
+            line += " " + str(float(total_flooding) / total_words)
 
             f.write(line + "\n")
 

@@ -19,3 +19,31 @@ pred_co <- predict(model_co, test_co[,2:length(test_co)])
 
 accuracy_co <- sum(diag(table(pred_co, test_co[,1]))) / length(test_co[,1])
 accuracy_co
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+train <- train_ge[,1001:length(train_ge)]
+train <- cbind(train_ge[,1], train)
+
+colnames(train)[1] <- "clase"
+
+test <- test_ge[,1001:length(test_ge)]
+test <- cbind(test_ge[,1], test)
+
+
+model <- naiveBayes(clase ~ ., data = train)
+pred <- predict(model, test[,2:length(test)])
+
+accuracy <- sum(diag(table(pred, test[,1]))) / length(test[,1])
+accuracy

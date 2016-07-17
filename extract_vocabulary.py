@@ -2,7 +2,7 @@
 
 import statistics
 from nltk.tokenize import TweetTokenizer
-from util import readlines, stripaccents
+from util import *
 import time
 
 tokenizer = TweetTokenizer()
@@ -24,9 +24,13 @@ for l in lines:
         country = parts[1]
         tweet = " ".join(parts[2:-1])
     
-        words = tokenizer.tokenize(stripaccents(tweet))
+        words = tokenizer.tokenize(tweet)
     
-        for w in words:
+        for wi in words:
+            w = stripaccents(wi)
+            if wi == "":
+                continue
+
             if w not in count:
                 count[w] = dict()
             
