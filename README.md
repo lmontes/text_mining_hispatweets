@@ -1,17 +1,10 @@
-# text_mining_hispatweets
+# Text Mining dataset HispaTweets
 
-process_tweets.py
-  
-  Lee todos los ficheros con los tweets para extraer solo el texto y dejarlos en una representación más compacta.
+### Scripts en python
 
-extract_vocabulary.py
+Se han creado una serie de script en python para extraer y transformar los tweets del dataset y así poder crear un modelo de Machine Learning que sirva para clasificarlos. Estos script son:
 
-  Extrae las palabras de los tweets y calcula las frecuencias por clase y desviaciones típicas.
-
-generate_bow.py
-
-  Obtiene un BoW (Bag of Words) a partir del vocabulario.
-
-generate_samples.py
-
-  Dados los ficheros con los BOWs genera las representaciones de las muestras para poder aprender un modelo.
+* **process_tweets.py**: lee todos los ficheros con los tweets para extraer solo el texto y dejarlos en una representación más compacta.
+* **extract_vocabulary.py**: extrae las palabras de los tweets y calcula las frecuencias por clase y desviaciones típicas.
+* **generate_bow.py**: obtiene un BoW (Bag of Words) a partir del vocabulario.
+* **generate_samples.py**: dados los ficheros con los BOWs genera las representaciones de las muestras para poder aprender un modelo.
