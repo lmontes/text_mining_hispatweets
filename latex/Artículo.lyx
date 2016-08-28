@@ -1,0 +1,1554 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+
+\usepackage{acl2015}\usepackage{times}\usepackage{url}\usepackage{latexsym}
+
+\title{Author profiling}
+
+\author{Luis Miguel Montes Novella \\
+  {\tt lmontesnovella@gmail.com} \\}
+\end_preamble
+\use_default_options false
+\maintain_unincluded_children false
+\language english
+\language_package none
+\inputencoding auto
+\fontencoding default
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 11
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder true
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
+\papersize a4paper
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 0
+\use_mathdots 0
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date true
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+maketitle
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Abstract
+En este artículo se describe cómo se ha aproximado la tarea de 
+\shape italic
+author profiling
+\shape default
+ para la identificación de género y país en un conjunto de textos extraídos
+ de 
+\shape italic
+Twitter
+\shape default
+.
+ Para llevar a cabo esta tarea se han extraído una serie de características
+ del texto que se cree que pueden ayudar a diferenciar entre géneros o países
+ de procedencia.
+ Las características extraídas son el uso de emoticonos, el uso de ciertas
+ características en el estilo de escritura como el 
+\shape italic
+character flooding
+\shape default
+, la inclusión de números, direcciones 
+\shape italic
+web
+\shape default
+ o correos electrónicos en los textos, etc.
+ Además de estas características se ha obtenido un 
+\shape italic
+BoW
+\shape default
+ 
+\shape italic
+(Bag of Words)
+\shape default
+ con las palabras que ayudan a diferenciar mejor entre géneros y países.
+ Para la evaluación de los resultados se ha usado el lenguaje de programación
+ 
+\shape italic
+R
+\shape default
+.
+ Para la clasificación se han usado dos modelos, uno entrenado mediante
+ 
+\shape italic
+Naive Bayes
+\shape default
+ y otro que hace uso de árboles de clasificación.
+\end_layout
+
+\begin_layout Section
+Introducción
+\end_layout
+
+\begin_layout Standard
+El 
+\shape italic
+author profiling
+\shape default
+ es una tarea que consiste en la identificación de tipos o clases de autores
+ a partir de textos escritos mediante la búsqueda de patrones comunes en
+ el estilo de escritura.
+ Esta clasificación de autores en diferentes grupos tiene numerosas aplicaciones
+ como por ejemplo la identificación de personas sobre las que dirigir las
+ campañas publicitarias o políticas.
+ En concreto en este trabajo se han seguido dos aproximaciones, la detección
+ de género y la detección de variedad del lenguaje en países hispanohablantes.
+ Para la primera aproximación tenemos 3 posibilidades, detectar si se trata
+ de un hombre, una mujer o bien no se ha podido identificar el género (se
+ cree que pueden ser perfiles institucionales).
+ En cuanto a la segunda aproximación tenemos 7 posibles países, Argentina
+ (AR), Chile (CL), Colombia (CO), España (ES), México (MX), Perú (PE) y
+ Venezuela (VE).
+\end_layout
+
+\begin_layout Section
+
+\shape italic
+Dataset
+\end_layout
+
+\begin_layout Standard
+El 
+\shape italic
+dataset
+\shape default
+ 
+\shape italic
+HispaTweets
+\shape default
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "DATASET"
+
+\end_inset
+
+ contiene 
+\shape italic
+tweets
+\shape default
+ de 4550 autores, se compone de una serie de ficheros, uno por autor, con
+ todos los 
+\shape italic
+tweets
+\shape default
+ que este ha escrito.
+ Estos 
+\shape italic
+tweets
+\shape default
+ se encuentran escritos en castellano.
+ Este 
+\shape italic
+dataset
+\shape default
+ contiene un total de 4550 ficheros donde tenemos 650 autores de cada país.
+ En la tabla 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:Clase"
+
+\end_inset
+
+ se puede ver la distribución de los autores en función de las clases a
+ las que pertenecen, como se puede observar la distribución en cuanto a
+ país es equilibrada pero en lo referente al género el número de muestras
+ de cada clase es muy diferente, en este caso se ve como la mayor parte
+ de los 
+\shape italic
+tweets
+\shape default
+ pertenecen al género desconocido, es decir, no se han podido clasificar.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+
+\shape italic
+\size small
+\begin_inset Tabular
+<lyxtabular version="3" rows="9" columns="5">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+Mujer
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+Hombre
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+Desc
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+TOTAL
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+AR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+150
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+198
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+302
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+650
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+CL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+126
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+285
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+239
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+650
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+CO
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+136
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+249
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+265
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+650
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+ES
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+148
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+249
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+253
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+650
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+MX
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+111
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+265
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+274
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+650
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+PE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+155
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+259
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+236
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+650
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+VE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+98
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+258
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+294
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+650
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+TOTAL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+924
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+1763
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size small
+1863
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+4550
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:Clase"
+
+\end_inset
+
+Distribución de los totales por clase
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Propuesta del alumno
+\end_layout
+
+\begin_layout Standard
+En este apartado se describen las características extraídas del texto y
+ las variables obtenidas a partir de éstas para entrenar diferentes modelos
+ de clasificación mediante el algoritmo 
+\shape italic
+Naive Bayes
+\shape default
+ y árboles de clasificación.
+ Para la extracción de características del texto se ha usado el lenguaje
+ de programación 
+\shape italic
+Python
+\shape default
+ y para entrenar y validar los modelos de clasificación el lenguaje de análisis
+ de datos 
+\shape italic
+R.
+\end_layout
+
+\begin_layout Subsection
+Información extraída del texto
+\end_layout
+
+\begin_layout Standard
+A la hora de procesar el dataset se han seguido los siguientes pasos.
+ En primer lugar se han procesado los ficheros para extraer la información
+ necesaria y guardarla de una forma más compacta, para ello se han creado
+ dos ficheros, uno de entrenamiento y otro de test.
+ En estos ficheros por cada autor aparecen las clases a las que pertenece
+ seguidas de los textos de todos sus 
+\shape italic
+tweets
+\shape default
+.
+ Tras este preproceso se ha conseguido reducir el tamaño del dataset original
+ desde 13 GB hasta aproximadamente 350 MB.
+\end_layout
+
+\begin_layout Subsubsection
+
+\shape italic
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Bag-of-Words"
+
+\end_inset
+
+Bag of Words
+\end_layout
+
+\begin_layout Standard
+Un 
+\shape italic
+BoW
+\shape default
+ 
+\shape italic
+(Bag of Words)
+\shape default
+ es un conjunto de palabras que se usa para representar un texto, normalmente
+ se escogen palabras muy comunes o que ayudan a discriminar entre las diferentes
+ clases que hay que diferenciar.
+\end_layout
+
+\begin_layout Standard
+En este caso se ha modificado la forma de obtener el 
+\shape italic
+BoW
+\shape default
+ para intentar mejorar los resultados en ambas tareas, para ello se han
+ procesado los textos y se han tokenizado mediante el uso de la clase 
+\shape italic
+TweetTokenizer
+\shape default
+ de la librería 
+\shape italic
+NLTK
+\shape default
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "NLTK"
+
+\end_inset
+
+.
+ De estos tokens se han eliminado los caracteres extraños (como por ejemplo
+ los emoticonos), se han convertido todos sus caracteres a minúsculas y
+ se ha creado un vocabulario con las palabras y símbolos que aparecen más
+ de 500 veces.
+ Para cada palabra de las de este vocabulario se han obtenido las frecuencias
+ de aparición de esta por cada clase diferenciando entre género y país.
+ Para las frecuencias de país y las frecuencias de género de cada palabra
+ se ha calculado la desviación típica.
+ Por tanto por cada palabra tenemos su frecuencia absoluta por cada clase,
+ la desviación típica de las frecuencias por género y la desviación típica
+ de las frecuencias por país.
+ De esta forma al ordenar las palabras por desviación típica de forma decrecient
+e es posible ver cuáles son las palabras que más ayudan a discriminar entre
+ las clases, esto es porque la desviación típica será mayor cuanto mayores
+ sean las frecuencias y mayor diferencia haya entre ellas.
+ Una vez ordenadas estas palabras se han obtenido dos 
+\shape italic
+BoWs
+\shape default
+ con 1000 palabras, uno para género y otro para país.
+\end_layout
+
+\begin_layout Subsubsection
+Uso de emoticonos
+\end_layout
+
+\begin_layout Standard
+En las redes sociales es muy frecuente el uso de emoticonos, su uso podría
+ estar muy relacionado con el género ya que se usan frecuentemente para
+ expresar sentimientos y en este aspecto suele haber muchas diferencias
+ entre hombres y mujeres.
+ Dado que el texto se encuentra codificado en Unicode se han identificado
+ los códigos correspondientes con estos emoticonos durante el procesamiento
+ de los textos.
+\end_layout
+
+\begin_layout Subsubsection
+Hashtags y menciones
+\end_layout
+
+\begin_layout Standard
+Dado que 
+\shape italic
+Twitter
+\shape default
+ es una red social donde abunda el uso de 
+\shape italic
+hashtags
+\shape default
+ y menciones se han extraído estas características de los 
+\shape italic
+tweets
+\shape default
+ para ver si su uso ayuda a diferenciar entre géneros o países.
+\end_layout
+
+\begin_layout Subsubsection
+Risas
+\end_layout
+
+\begin_layout Standard
+La frecuencia del uso de risas en los mensajes de 
+\shape italic
+chat
+\shape default
+ podría ayudar a detectar el género de una persona.
+ Para ello se ha realizado el parseo del texto buscando si los 
+\shape italic
+tokens
+\shape default
+ que aparecen se corresponden con risas.
+ Se ha considerado una risa toda cadena de texto que contiene en su interior
+ una subcadena como
+\shape italic
+ jaj
+\shape default
+, 
+\shape italic
+jej
+\shape default
+, 
+\shape italic
+jij
+\shape default
+, 
+\shape italic
+joj
+\shape default
+ o 
+\shape italic
+juj
+\shape default
+.
+ Esta detección se ha hecho mediante el uso de expresiones regulares sobre
+ cada uno de los 
+\shape italic
+tokens
+\shape default
+.
+\end_layout
+
+\begin_layout Subsubsection
+Character flooding
+\end_layout
+
+\begin_layout Standard
+El 
+\shape italic
+character flooding
+\shape default
+ es un estilo de escritura que consiste en el alargamiento de palabras duplicand
+o letras o añadiendo letras que no existen como por ejemplo la o en 
+\shape italic
+hooola
+\shape default
+ o la h en 
+\shape italic
+tengohh
+\shape default
+.
+ Se cree que esta característica puede ayudar a diferenciar entre géneros
+ ya que se puede considerar una forma de expresar sentimientos.
+\end_layout
+
+\begin_layout Standard
+Se ha usado un algoritmo para detectar 
+\shape italic
+character flooding
+\shape default
+ a nivel de palabras.
+ Para ello se ha considerado que una palabra tiene 
+\shape italic
+character flooding
+\shape default
+ siempre que contiene más de dos vocales seguidas o dos caracteres seguidos
+ que no sean c, l, r o vocal.
+ Se han excluido estos caracteres porque en castellano pueden aparecer juntos.
+ No se ha tenido en cuenta el idioma de la palabra por lo que puede algunas
+ palabras en otros idiomas dentro de los textos que se considere que tienen
+ 
+\shape italic
+character flooding.
+
+\shape default
+ Hay que tener en cuenta que algunos 
+\shape italic
+tokens
+\shape default
+ también pueden ser números por lo que si un 
+\shape italic
+token
+\shape default
+ es un número no se considera 
+\shape italic
+character flooding
+\shape default
+.
+\end_layout
+
+\begin_layout Subsubsection
+Otros
+\end_layout
+
+\begin_layout Standard
+Además de todo lo anterior también se ha procesado el texto con expresiones
+ regulares en busca de direcciones 
+\shape italic
+web
+\shape default
+, correos electrónicos y números para ver si la aparición de éstos en un
+ texto puede ayudar a diferenciar entre los diferentes géneros o países.
+\end_layout
+
+\begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Variables-usadas"
+
+\end_inset
+
+Variables usadas
+\end_layout
+
+\begin_layout Standard
+Tras el procesamiento de los diferentes textos se han generado varios ficheros
+ de entrenamiento y test con las diferentes características extraídas de
+ ellos, a continuación se enumeran las características usadas:
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+\shape italic
+BoW
+\series default
+\shape default
+: 
+\shape italic
+Bag of Words
+\shape default
+ con 1000 palabras obtenido con el proceso del apartado 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Bag-of-Words"
+
+\end_inset
+
+.
+ Para cada palabra se indica la frecuencia relativa de aparición dentro
+ de cada texto.
+ Hay que tener en cuenta que el 
+\shape italic
+BoW
+\shape default
+ usado para diferenciar entre géneros y países es diferente.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+ratio de emoticonos
+\series default
+: número de emoticonos en el texto entre el total de palabras del texto.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+ratio de hashtags
+\series default
+: número de hashtags en el texto entre el total de palabras del texto.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+ratio de menciones
+\series default
+: número de menciones en el texto entre el total de palabras del texto.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+ratio de risas
+\series default
+: número de risas entre el total de palabras del texto.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+ratio de 
+\shape italic
+character flooding
+\series default
+\shape default
+: número de palabras con 
+\shape italic
+character flooding
+\shape default
+ entre el total de palabras del texto.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+ratio de uso de direcciones 
+\shape italic
+web
+\series default
+\shape default
+: número de direcciones 
+\shape italic
+web
+\shape default
+ en el texto entre el total de palabras del texto.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+ratio de números
+\series default
+: cantidad de veces que aparecen números en un texto entre el total de palabras
+ del texto.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+ratio de uso de direcciones de correo electrónico
+\series default
+: número de direcciones de correo electrónico entre el total de palabras
+ del texto.
+\end_layout
+
+\begin_layout Section
+Resultados
+\end_layout
+
+\begin_layout Subsection
+Modelos empleados
+\end_layout
+
+\begin_layout Standard
+Una vez obtenidos los ficheros de entrenamiento y test a partir de los textos
+ se han escogido los modelos de aprendizaje automático a usar para la tarea
+ de clasificación.
+ Se ha decidido escoger dos tipos de modelos diferentes.
+ En primer lugar se ha escogido un modelo de clasificación que emplea la
+ técnica de 
+\shape italic
+Naive Bayes
+\shape default
+ debido a la simplicidad de este tipo de modelos y la rapidez con la que
+ se pueden entrenar y evaluar.
+ En segundo lugar se ha escogido un modelo que hace uso de árboles de clasificac
+ión, este modelo se ha escogido debido a que los árboles de clasificación
+ generalmente escogen mejor las variables que más ayudan a discriminar entre
+ clases y los modelos resultantes suelen ser más fáciles de interpretar
+ por los humanos.
+ Para el entrenamiento y evaluación de los modelos se ha empleado el lenguaje
+ de programación 
+\shape italic
+R
+\shape default
+ con las librerías 
+\shape italic
+e1071
+\shape default
+ y 
+\shape italic
+rpart
+\shape default
+.
+\end_layout
+
+\begin_layout Subsection
+Resultados experimentales
+\end_layout
+
+\begin_layout Standard
+En la tabla 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:Resultados"
+
+\end_inset
+
+ se pueden observar los resultados obtenidos, en la primera fila se muestran
+ los resultados para el algoritmo 
+\shape italic
+Naive Bayes
+\shape default
+ haciendo uso del 
+\shape italic
+BoW
+\shape default
+, se puede observar que los resultados obtenidos para el género son pésimos
+ ya que prácticamente coinciden con la probabilidad de acertar la clase
+ al azar.
+ Sin embargo para el país se obtienen buenos resultados.
+ En la segunda fila se pueden ver los resultados que se obtienen cuando
+ no se usa BoW, en el caso del género mejoran pero en el caso del país empeoran
+ considerablemente.
+ Por último al usar árboles de clasificación los resultados en la clasificación
+ de género mejoran y los de país se aproximan a los obtenidos con el modelo
+ entrenado mediante Naive Bayes.
+ Por tanto, para la clasificación de tweets por género funcionan mejor los
+ árboles de clasificación y para la identificación de la variedad del lenguaje
+ funciona mejor el algoritmo de Naive Bayes haciendo uso del BoW y del resto
+ de características extraídas.
+ Como conclusión cabe destacar que para todas las tareas no funcionan igual
+ de bien todos los métodos y que por más características que se añadan al
+ dataset no siempre van a mejorar los resultados ya que eso depende en gran
+ medida de la capacidad del algoritmo de aprendizaje usado para escoger
+ las variables que más ayudan a discriminar entre las diferentes clases.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Género
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+País
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multicolumn="1" alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Naive Bayes con BoW
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+33.68 %
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+85.16 %
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Naive Bayes sin BoW
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+40.05 %
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+20.88 %
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Aŕboles de clasificación
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+48.02 %
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+83.46 %
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:Resultados"
+
+\end_inset
+
+Resultados obtenidos
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Conclusiones y trabajo futuro
+\end_layout
+
+\begin_layout Standard
+Tras observar los resultados obtenidos se puede concluir que aunque las
+ tareas de clasificación parezcan similares no siempre funciona bien el
+ mismo tipo de modelo ya que para género Naive Bayes no ha funcionado bien
+ mientras que para país se han obtenido unos buenos resultados.
+\end_layout
+
+\begin_layout Standard
+Tras analizar los BoWs obtenidos para género y país se puede apreciar como
+ sobretodo en el caso de los paises abundan nombres de ciudades, políticos,
+ palabras características de esos países, etc.
+ 
+\end_layout
+
+\begin_layout Standard
+En cuanto al uso de expresiones regulares estas pueden penalizar la ejecución
+ del código pero este proceso se podría distribuir sobre los nodos de un
+ clúster ya que el proceso de los textos de cada autor es independiente.
+\end_layout
+
+\begin_layout Standard
+En cuanto a posibles mejoras se puede intentar mejorar la generación del
+ 
+\shape italic
+BoW
+\shape default
+ y extraer otras características mediante el uso de diccionarios, por ejemplo
+ se podría usar un diccionario con palabras en inglés para detectar el uso
+ de este idioma en los textos en castellano ya que es algo bastante frecuente.
+ Además el uso de diccionarios puede ayudar a no detectar como como 
+\shape italic
+character flooding
+\shape default
+ algunas palabras en otros idiomas.
+ Otra mejora sería la eliminación del 
+\shape italic
+BoW
+\shape default
+ de algunos 
+\shape italic
+tokens
+\shape default
+ como por ejemplo los símbolos, signos de puntuación o números ya que incluir
+ esto en el 
+\shape italic
+BoW
+\shape default
+ puede causar un sobreajuste del algoritmo.
+ Por otra parte si se extrae como característica la frecuencia de uso de
+ estos símbolos se podrían obtener mejores resultados.
+ A parte de todo esto se podría realizar un mayor análisis de tokens que
+ aparecen entre los textos como por ejemplo direcciones web o de correo
+ electrónico, si de estas direcciones se analiza el dominio esto podría
+ ayudar a diferenciar mejor los países.
+ También se podría añadir información adicional sobre los autores extrayendo
+ su descripción y añadiéndola a sus tweets o intentando analizar el género
+ de las palabras que usa en ella para averiguar su género ya que en la descripci
+ón es habitual hablar sobre uno mismo.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+label "1"
+key "DATASET"
+
+\end_inset
+
+[1] 
+\begin_inset CommandInset href
+LatexCommand href
+name "s3.amazonaws.com/cosmos.datasets/hispatweets.zip"
+target "https://s3.amazonaws.com/cosmos.datasets/hispatweets.zip"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+label "2"
+key "NLTK"
+
+\end_inset
+
+[2] 
+\begin_inset CommandInset href
+LatexCommand href
+name "www.nltk.org"
+target "http://www.nltk.org"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+label "3"
+key "Codigo"
+
+\end_inset
+
+[3] 
+\begin_inset CommandInset href
+LatexCommand href
+name "github.com/lmontes/text_mining_hispatweets"
+target "https://github.com/lmontes/text_mining_hispatweets"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

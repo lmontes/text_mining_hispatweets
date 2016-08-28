@@ -23,7 +23,6 @@ pred_ge <- predict(model_ge, test_ge[,2:length(test_ge)], type = "class")
 accuracy_ge <- sum(diag(table(pred_ge, test_ge[,1]))) / length(test_ge[,1])
 accuracy_ge
 
-
 # Genero - NB sin BoW (0.4005495)
 train <- train_ge[,999:length(train_ge)]
 train <- cbind(train_ge[,1], train)
@@ -56,16 +55,17 @@ accuracy_co <- sum(diag(table(pred_co, test_co[,1]))) / length(test_co[,1])
 accuracy_co
 
 
+# Pais - NB sin BoW (0.4005495)
+train <- train_co[,999:length(train_co)]
+train <- cbind(train_co[,1], train)
 
+colnames(train)[1] <- "clase"
 
+test <- test_co[,999:length(test_co)]
+test <- cbind(test_co[,1], test)
 
+model <- naiveBayes(clase ~ ., data = train)
+pred <- predict(model, test[,2:length(test)])
 
-
-
-
-
-
-
-
-
-
+accuracy <- sum(diag(table(pred, test[,1]))) / length(test[,1])
+accuracy
