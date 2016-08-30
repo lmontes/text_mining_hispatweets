@@ -30,4 +30,4 @@ Para finalizar hay que abrir el proyecto de RStudio y ejecutar el script **check
 
 ### Artículo
 
-El artículo se encuentra en la raíz del proyecto se puede acceder a él a través del enlace https://github.com/lmontes/text_mining_hispatweets/blob/master/Art%C3%ADculo.pdf
+El artículo se encuentra en la raíz del proyecto se puede acceder a él a través de este [enlace](https://github.com/lmontes/text_mining_hispatweets/blob/master/Art%C3%ADculo.pdf).
