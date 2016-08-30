@@ -113,11 +113,11 @@ Twitter
 \shape italic
 character flooding
 \shape default
-, la inclusión de números, direcciones 
+, la inclusión en los textos de números, direcciones 
 \shape italic
 web
 \shape default
- o correos electrónicos en los textos, etc.
+, correos electrónicos, etc.
  Además de estas características se ha obtenido un 
 \shape italic
 BoW
@@ -127,14 +127,18 @@ BoW
 (Bag of Words)
 \shape default
  con las palabras que ayudan a diferenciar mejor entre géneros y países.
- Para la evaluación de los resultados se ha usado el lenguaje de programación
+ Para el procesamiento de los textos se ha usado el lenguaje de programación
  
+\shape italic
+Python
+\shape default
+ y para el entrenamiento y evaluación de los modelos de clasificación se
+ ha usado 
 \shape italic
 R
 \shape default
 .
- Para la clasificación se han usado dos modelos, uno entrenado mediante
- 
+ Se han usado dos modelos, uno entrenado mediante 
 \shape italic
 Naive Bayes
 \shape default
@@ -160,15 +164,13 @@ author profiling
  de género y la detección de variedad del lenguaje en países hispanohablantes.
  Para la primera aproximación tenemos 3 posibilidades, detectar si se trata
  de un hombre, una mujer o bien no se ha podido identificar el género (se
- cree que pueden ser perfiles institucionales).
+ cree que muchos de estos perfiles pueden pertenecer a diferentes instituciones).
  En cuanto a la segunda aproximación tenemos 7 posibles países, Argentina
  (AR), Chile (CL), Colombia (CO), España (ES), México (MX), Perú (PE) y
  Venezuela (VE).
 \end_layout
 
 \begin_layout Section
-
-\shape italic
 Dataset
 \end_layout
 
@@ -192,17 +194,12 @@ key "DATASET"
 \shape italic
 tweets
 \shape default
- de 4550 autores, se compone de una serie de ficheros, uno por autor, con
- todos los 
+ de 4550 autores hispanohablantes, se compone de una serie de ficheros,
+ uno por autor, con todos los 
 \shape italic
 tweets
 \shape default
  que este ha escrito.
- Estos 
-\shape italic
-tweets
-\shape default
- se encuentran escritos en castellano.
  Este 
 \shape italic
 dataset
@@ -749,6 +746,9 @@ TOTAL
 \end_layout
 
 \begin_layout Plain Layout
+
+\shape italic
+\size footnotesize
 \begin_inset Caption
 
 \begin_layout Plain Layout
@@ -785,7 +785,7 @@ Propuesta del alumno
 \begin_layout Standard
 En este apartado se describen las características extraídas del texto y
  las variables obtenidas a partir de éstas para entrenar diferentes modelos
- de clasificación mediante el algoritmo 
+ mediante el algoritmo 
 \shape italic
 Naive Bayes
 \shape default
@@ -810,14 +810,23 @@ A la hora de procesar el dataset se han seguido los siguientes pasos.
  En primer lugar se han procesado los ficheros para extraer la información
  necesaria y guardarla de una forma más compacta, para ello se han creado
  dos ficheros, uno de entrenamiento y otro de test.
- En estos ficheros por cada autor aparecen las clases a las que pertenece
- seguidas de los textos de todos sus 
+ En estos ficheros por cada autor aparece su género, país y los textos de
+ todos sus 
 \shape italic
 tweets
 \shape default
 .
- Tras este preproceso se ha conseguido reducir el tamaño del dataset original
+ Con este preproceso se ha conseguido reducir el tamaño del dataset original
  desde 13 GB hasta aproximadamente 350 MB.
+ Una vez realizado este preproceso se han usado una serie de scripts en
+ 
+\shape italic
+Python
+\shape default
+ para obtener un vocabulario y una representación de las muestras de entrenamien
+to y test para poder entrenar diversos modelos de clasificación.
+ En los siguientes subapartados se describen las características extraídas
+ de los textos.
 \end_layout
 
 \begin_layout Subsubsection
@@ -829,21 +838,19 @@ name "sub:Bag-of-Words"
 
 \end_inset
 
+
+\shape default
 Bag of Words
 \end_layout
 
 \begin_layout Standard
 Un 
 \shape italic
-BoW
+Bag of Words, BoW
 \shape default
- 
-\shape italic
-(Bag of Words)
-\shape default
- es un conjunto de palabras que se usa para representar un texto, normalmente
- se escogen palabras muy comunes o que ayudan a discriminar entre las diferentes
- clases que hay que diferenciar.
+ o Bolsa de Palabras es un conjunto de palabras que se usa para representar
+ un texto, normalmente se escogen palabras de uso común o que ayudan a discrimin
+ar entre las diferentes clases que hay que diferenciar.
 \end_layout
 
 \begin_layout Standard
@@ -852,7 +859,11 @@ En este caso se ha modificado la forma de obtener el
 BoW
 \shape default
  para intentar mejorar los resultados en ambas tareas, para ello se han
- procesado los textos y se han tokenizado mediante el uso de la clase 
+ procesado los textos y se han 
+\shape italic
+tokenizado
+\shape default
+ mediante el uso de la clase 
 \shape italic
 TweetTokenizer
 \shape default
@@ -868,12 +879,19 @@ key "NLTK"
 \end_inset
 
 .
- De estos tokens se han eliminado los caracteres extraños (como por ejemplo
- los emoticonos), se han convertido todos sus caracteres a minúsculas y
- se ha creado un vocabulario con las palabras y símbolos que aparecen más
- de 500 veces.
+ De estos 
+\shape italic
+tokens
+\shape default
+ se han eliminado los caracteres extraños (como por ejemplo los emoticonos),
+ se han convertido todos sus caracteres a minúsculas y se ha creado un vocabular
+io con los 
+\shape italic
+tokens
+\shape default
+ que aparecen más de 500 veces.
  Para cada palabra de las de este vocabulario se han obtenido las frecuencias
- de aparición de esta por cada clase diferenciando entre género y país.
+ de aparición por cada clase diferenciando entre género y país.
  Para las frecuencias de país y las frecuencias de género de cada palabra
  se ha calculado la desviación típica.
  Por tanto por cada palabra tenemos su frecuencia absoluta por cada clase,
@@ -901,7 +919,7 @@ En las redes sociales es muy frecuente el uso de emoticonos, su uso podría
  entre hombres y mujeres.
  Dado que el texto se encuentra codificado en Unicode se han identificado
  los códigos correspondientes con estos emoticonos durante el procesamiento
- de los textos.
+ de los textos para contar el número de emoticonos que aparecen.
 \end_layout
 
 \begin_layout Subsubsection
@@ -917,11 +935,8 @@ Twitter
 \shape italic
 hashtags
 \shape default
- y menciones se han extraído estas características de los 
-\shape italic
-tweets
-\shape default
- para ver si su uso ayuda a diferenciar entre géneros o países.
+ y menciones se han identificado estas características para ver si su uso
+ puede ayudar a diferenciar entre géneros o países.
 \end_layout
 
 \begin_layout Subsubsection
@@ -933,7 +948,9 @@ La frecuencia del uso de risas en los mensajes de
 \shape italic
 chat
 \shape default
- podría ayudar a detectar el género de una persona.
+ podría ayudar a detectar el género de una persona, sobretodo para diferenciar
+ los perfiles institucionales ya que el lenguaje usado por ellos debería
+ ser más formal.
  Para ello se ha realizado el parseo del texto buscando si los 
 \shape italic
 tokens
@@ -989,7 +1006,8 @@ tengohh
 \shape default
 .
  Se cree que esta característica puede ayudar a diferenciar entre géneros
- ya que se puede considerar una forma de expresar sentimientos.
+ ya que se puede considerar una forma de expresar sentimientos y estados
+ de ánimo.
 \end_layout
 
 \begin_layout Standard
@@ -1005,26 +1023,6 @@ character flooding
  siempre que contiene más de dos vocales seguidas o dos caracteres seguidos
  que no sean c, l, r o vocal.
  Se han excluido estos caracteres porque en castellano pueden aparecer juntos.
- No se ha tenido en cuenta el idioma de la palabra por lo que puede algunas
- palabras en otros idiomas dentro de los textos que se considere que tienen
- 
-\shape italic
-character flooding.
-
-\shape default
- Hay que tener en cuenta que algunos 
-\shape italic
-tokens
-\shape default
- también pueden ser números por lo que si un 
-\shape italic
-token
-\shape default
- es un número no se considera 
-\shape italic
-character flooding
-\shape default
-.
 \end_layout
 
 \begin_layout Subsubsection
@@ -1048,13 +1046,42 @@ name "sub:Variables-usadas"
 
 \end_inset
 
-Variables usadas
+Modelos empleados
 \end_layout
 
 \begin_layout Standard
-Tras el procesamiento de los diferentes textos se han generado varios ficheros
- de entrenamiento y test con las diferentes características extraídas de
- ellos, a continuación se enumeran las características usadas:
+Una vez obtenidos los ficheros de entrenamiento y test a partir de los textos
+ se han escogido los modelos de aprendizaje automático a usar para la tarea
+ de clasificación.
+ Se ha decidido escoger dos tipos de modelos diferentes.
+ En primer lugar se ha escogido un modelo de clasificación que emplea la
+ técnica de 
+\shape italic
+Naive Bayes
+\shape default
+ debido a la simplicidad de este tipo de modelos y la rapidez con la que
+ se pueden entrenar y evaluar.
+ En segundo lugar se ha escogido un modelo que hace uso de árboles de clasificac
+ión, este modelo se ha escogido debido a que los árboles de clasificación
+ generalmente escogen mejor las variables que más ayudan a discriminar entre
+ clases y los modelos resultantes suelen ser más fáciles de interpretar
+ por los humanos.
+ Para el entrenamiento y evaluación de los modelos se ha empleado el lenguaje
+ de programación 
+\shape italic
+R
+\shape default
+ con las librerías 
+\shape italic
+e1071 (Naive Bayes)
+\shape default
+ y 
+\shape italic
+rpart
+\shape default
+ (árboles de clasificación).
+ En los modelos se han usado las siguientes variables basadas en las característ
+icas extraídas de los textos:
 \end_layout
 
 \begin_layout Itemize
@@ -1078,11 +1105,11 @@ reference "sub:Bag-of-Words"
 .
  Para cada palabra se indica la frecuencia relativa de aparición dentro
  de cada texto.
- Hay que tener en cuenta que el 
+ Hay que tener en cuenta que los 
 \shape italic
-BoW
+BoWs
 \shape default
- usado para diferenciar entre géneros y países es diferente.
+ usados para diferenciar entre géneros y países son diferentes.
 \end_layout
 
 \begin_layout Itemize
@@ -1169,47 +1196,6 @@ ratio de uso de direcciones de correo electrónico
 Resultados
 \end_layout
 
-\begin_layout Subsection
-Modelos empleados
-\end_layout
-
-\begin_layout Standard
-Una vez obtenidos los ficheros de entrenamiento y test a partir de los textos
- se han escogido los modelos de aprendizaje automático a usar para la tarea
- de clasificación.
- Se ha decidido escoger dos tipos de modelos diferentes.
- En primer lugar se ha escogido un modelo de clasificación que emplea la
- técnica de 
-\shape italic
-Naive Bayes
-\shape default
- debido a la simplicidad de este tipo de modelos y la rapidez con la que
- se pueden entrenar y evaluar.
- En segundo lugar se ha escogido un modelo que hace uso de árboles de clasificac
-ión, este modelo se ha escogido debido a que los árboles de clasificación
- generalmente escogen mejor las variables que más ayudan a discriminar entre
- clases y los modelos resultantes suelen ser más fáciles de interpretar
- por los humanos.
- Para el entrenamiento y evaluación de los modelos se ha empleado el lenguaje
- de programación 
-\shape italic
-R
-\shape default
- con las librerías 
-\shape italic
-e1071
-\shape default
- y 
-\shape italic
-rpart
-\shape default
-.
-\end_layout
-
-\begin_layout Subsection
-Resultados experimentales
-\end_layout
-
 \begin_layout Standard
 En la tabla 
 \begin_inset CommandInset ref
@@ -1232,15 +1218,33 @@ BoW
  al azar.
  Sin embargo para el país se obtienen buenos resultados.
  En la segunda fila se pueden ver los resultados que se obtienen cuando
- no se usa BoW, en el caso del género mejoran pero en el caso del país empeoran
- considerablemente.
- Por último al usar árboles de clasificación los resultados en la clasificación
- de género mejoran y los de país se aproximan a los obtenidos con el modelo
- entrenado mediante Naive Bayes.
- Por tanto, para la clasificación de tweets por género funcionan mejor los
- árboles de clasificación y para la identificación de la variedad del lenguaje
- funciona mejor el algoritmo de Naive Bayes haciendo uso del BoW y del resto
- de características extraídas.
+ no se usa 
+\shape italic
+BoW
+\shape default
+, en el caso del género mejoran pero en el caso del país empeoran considerableme
+nte.
+ Por último al usar árboles de clasificación con todas las variables los
+ resultados en la clasificación de género mejoran y los de país se aproximan
+ a los obtenidos con el modelo entrenado mediante 
+\shape italic
+Naive Bayes
+\shape default
+.
+ Por tanto, para la clasificación de 
+\shape italic
+tweets
+\shape default
+ por género funcionan mejor los árboles de clasificación y para la identificació
+n de la variedad del lenguaje funciona mejor el algoritmo de 
+\shape italic
+Naive Bayes
+\shape default
+ haciendo uso del 
+\shape italic
+BoW
+\shape default
+ y del resto de características extraídas.
  Como conclusión cabe destacar que para todas las tareas no funcionan igual
  de bien todos los métodos y que por más características que se añadan al
  dataset no siempre van a mejorar los resultados ya que eso depende en gran
@@ -1407,6 +1411,9 @@ Aŕboles de clasificación
 \end_layout
 
 \begin_layout Plain Layout
+
+\shape italic
+\size footnotesize
 \begin_inset Caption
 
 \begin_layout Plain Layout
@@ -1436,21 +1443,36 @@ Conclusiones y trabajo futuro
 \begin_layout Standard
 Tras observar los resultados obtenidos se puede concluir que aunque las
  tareas de clasificación parezcan similares no siempre funciona bien el
- mismo tipo de modelo ya que para género Naive Bayes no ha funcionado bien
- mientras que para país se han obtenido unos buenos resultados.
+ mismo tipo de modelo ya que para género 
+\shape italic
+Naive Bayes
+\shape default
+ no ha funcionado bien mientras que para país se han obtenido unos buenos
+ resultados.
+ También cabe destacar la dificultad de la tarea de clasificación en el
+ caso del género debido a la existencia de un género desconocido, un autor
+ perteneciente a este género puede ser hombre o mujer, también puede darse
+ el caso de que haya 
+\shape italic
+tweets
+\shape default
+ mezclados tanto de hombres como de mujeres si se trata de un perfil institucion
+al.
+ Al ser el género desconocido la clase mayoritaria influye de manera negativa
+ en los resultados.
 \end_layout
 
 \begin_layout Standard
-Tras analizar los BoWs obtenidos para género y país se puede apreciar como
- sobretodo en el caso de los paises abundan nombres de ciudades, políticos,
- palabras características de esos países, etc.
+Tras analizar los 
+\shape italic
+BoWs
+\shape default
+ obtenidos para género y país se puede apreciar como sobretodo en el caso
+ de los paises abundan nombres de ciudades, políticos, palabras características
+ de esos países, etc.
+ En el caso del género también se aprecia como se han seleccionado algunas
+ palabras relacionadas con sentimientos, determinantes, etc.
  
-\end_layout
-
-\begin_layout Standard
-En cuanto al uso de expresiones regulares estas pueden penalizar la ejecución
- del código pero este proceso se podría distribuir sobre los nodos de un
- clúster ya que el proceso de los textos de cada autor es independiente.
 \end_layout
 
 \begin_layout Standard
@@ -1462,35 +1484,36 @@ BoW
  y extraer otras características mediante el uso de diccionarios, por ejemplo
  se podría usar un diccionario con palabras en inglés para detectar el uso
  de este idioma en los textos en castellano ya que es algo bastante frecuente.
- Además el uso de diccionarios puede ayudar a no detectar como como 
-\shape italic
-character flooding
-\shape default
- algunas palabras en otros idiomas.
- Otra mejora sería la eliminación del 
-\shape italic
-BoW
-\shape default
- de algunos 
+ Otra mejora sería la eliminación de algunos 
 \shape italic
 tokens
 \shape default
- como por ejemplo los símbolos, signos de puntuación o números ya que incluir
- esto en el 
+ del 
+\shape italic
+BoW
+\shape default
+ como por ejemplo los símbolos, signos de puntuación o números ya que incluirlos
+ en el 
 \shape italic
 BoW
 \shape default
  puede causar un sobreajuste del algoritmo.
  Por otra parte si se extrae como característica la frecuencia de uso de
  estos símbolos se podrían obtener mejores resultados.
- A parte de todo esto se podría realizar un mayor análisis de tokens que
- aparecen entre los textos como por ejemplo direcciones web o de correo
- electrónico, si de estas direcciones se analiza el dominio esto podría
- ayudar a diferenciar mejor los países.
+ A parte de todo esto se podría realizar un mayor análisis de 
+\shape italic
+tokens
+\shape default
+ que aparecen entre los textos como por ejemplo las direcciones web o de
+ correo electrónico, si de estas direcciones se analiza el dominio esto
+ podría ayudar a identificar los países.
  También se podría añadir información adicional sobre los autores extrayendo
- su descripción y añadiéndola a sus tweets o intentando analizar el género
- de las palabras que usa en ella para averiguar su género ya que en la descripci
-ón es habitual hablar sobre uno mismo.
+ su descripción y añadiéndola a sus 
+\shape italic
+tweets
+\shape default
+ o intentando analizar el género de las palabras que emplean a la hora de
+ describirse.
 \end_layout
 
 \begin_layout Bibliography
