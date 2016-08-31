@@ -1498,8 +1498,6 @@ BoW
 BoW
 \shape default
  puede causar un sobreajuste del algoritmo.
- Por otra parte si se extrae como característica la frecuencia de uso de
- estos símbolos se podrían obtener mejores resultados.
  A parte de todo esto se podría realizar un mayor análisis de 
 \shape italic
 tokens
@@ -1513,7 +1511,7 @@ tokens
 tweets
 \shape default
  o intentando analizar el género de las palabras que emplean a la hora de
- describirse.
+ describirse para así hacernos una idea del género de esa persona.
 \end_layout
 
 \begin_layout Bibliography
